@@ -1,3 +1,6 @@
+const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 module.exports = {
@@ -17,11 +20,18 @@ module.exports = {
   },
   // The bundled source code files shall result in a bundle.js file in the /dist folder.
   output: {
-    path: __dirname + "/dist",
+    path: path.resolve(__dirname, "../", "dist"),
     publicPath: "/",
     filename: "bundle.js",
   },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
+  plugins: [
+    new CleanWebpackPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({
+      title: "Hello Webpack bundled JavaScript Project",
+      template: "./src/index.html",
+    }),
+  ],
   // The /dist folder will be used to serve our application to the browser.
   devServer: {
     contentBase: "./dist",
