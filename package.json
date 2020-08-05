@@ -1,9 +1,7 @@
 {
-  "dependencies": {
-    "prettier": "^2.0.5"
-  },
+  "dependencies": {},
   "devDependencies": {},
-  "name": "Fischy",
+  "name": "fischy",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT"

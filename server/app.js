@@ -1,11 +1,23 @@
-const express = require("express");
+import express from "express";
+import cors from "cors";
+import userRoutes from "./user/userRoutes";
+import userModel from "./user/userModel";
 const app = express();
 
-// routes
+//allow to parse the payload from post request both normal and html form
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+
+//expose models on context for all routes
 app.use((req, res, next) => {
-  res.status(200).json({
-    message: "Hello world!!!",
-  });
+  req.context = {
+    userModel
+  };
+  next();
 });
+
+// routes
+app.use("/users", userRoutes);
 
 module.exports = app;

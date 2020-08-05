@@ -1,7 +1,6 @@
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require("webpack");
 
 module.exports = {
   //  the src/index.js file as entry point to bundle it. If the src/index.js file imports other JavaScript files, bundle them as well.
@@ -26,15 +25,10 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
+
     new HtmlWebpackPlugin({
       title: "Hello Webpack bundled JavaScript Project",
       template: "./src/index.html",
     }),
   ],
-  // The /dist folder will be used to serve our application to the browser.
-  devServer: {
-    contentBase: "./dist",
-    hot: true,
-  },
 };
