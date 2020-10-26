@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import userRoutes from "./user/userRoutes";
-import userModel from "./user/userModel";
+import userRoutes from "./domains/user/userRoutes";
+import userModel from "./domains/user/userModel";
 const app = express();
 
 //allow to parse the payload from post request both normal and html form

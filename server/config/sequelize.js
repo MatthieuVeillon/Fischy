@@ -1,25 +1,23 @@
-import Sequelize from 'sequelize';
+import { Sequelize } from "sequelize";
 
 const sequelize = new Sequelize(
-    process.env.DATABASE,
-    process.env.DATABASE_USER,
-    process.env.DATABASE_PASSWORD,
-    {
-        dialect: 'postgres',
-    },
+  process.env.DATABASE,
+  process.env.DATABASE_USER,
+  process.env.DATABASE_PASSWORD,
+  {
+    dialect: "postgres",
+  }
 );
 
 const models = {
-    User: sequelize.import('../domains/user/userModel.js'),
-    Message: sequelize.import('../domains/message/model.js'),
+  User: sequelize.import("../domains/user/userModel.js"),
+  Message: sequelize.import("../domains/message/model.js"),
 };
 
-Object.keys(models).forEach(key => {
-    if ('associate' in models[key]) {
-        models[key].associate(models);
-    }
+Object.keys(models).forEach((key) => {
+  if ("associate" in models[key]) {
+    models[key].associate(models);
+  }
 });
 
-export { sequelize };
-
-export default models;
+export { sequelize, models };
