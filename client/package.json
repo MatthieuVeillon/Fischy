@@ -36,6 +36,7 @@
   "dependencies": {
     "global": "^4.4.0",
     "http-server": "^0.12.3",
+    "prettier": "^2.1.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   }

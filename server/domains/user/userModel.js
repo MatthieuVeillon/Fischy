@@ -1,21 +1,20 @@
-import mongoose from "mongoose";
+const user = (sequelize, DataTypes) => {
+    const User = sequelize.define('user', {
+        username: {
+            type: DataTypes.STRING,
+            unique: true,
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+    });
 
-const userSchema = new mongoose.Schema(
-  {
-    id: {
-      type: String,
-      unique: true,
-      required: true
-    },
-    username: {
-      type: String,
-      unique: true,
-      required: true
-    }
-  },
-  { timestamps: true }
-);
+    User.associate = models => {
+        User.hasMany(models.Message, { onDelete: 'CASCADE' });
+    };
 
-const User = mongoose.model("User", userSchema);
+    return User;
+};
 
-export default User;
+export default user;
