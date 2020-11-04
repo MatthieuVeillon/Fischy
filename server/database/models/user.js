@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-
       User.hasMany(models.Post, {
         foreignKey: "userId",
         as: "posts",
@@ -22,6 +21,20 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
       });
     }
+
+    static findByLogin = async (login) => {
+      let user = await User.findOne({
+        where: { username: login },
+      });
+
+      if (!user) {
+        user = await User.findOne({
+          where: { email: login },
+        });
+      }
+
+      return user;
+    };
   }
 
   User.init(

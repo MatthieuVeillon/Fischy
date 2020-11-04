@@ -2,17 +2,11 @@ import { Sequelize } from "sequelize";
 import user from "./domains/user/userModel";
 import message from "./domains/messages/model";
 require("dotenv").config();
+import dbconfig from "./config/db.config.js";
 
-console.log("dbname", process.env.DATABASE);
+console.log("dbconfig", dbconfig.development);
 
-const sequelize = new Sequelize(
-  process.env.DATABASE,
-  process.env.DATABASE_USER,
-  process.env.DATABASE_PASSWORD,
-  {
-    dialect: "postgres",
-  }
-);
+const sequelize = new Sequelize(dbconfig.development);
 
 const models = {
   User: user(sequelize, Sequelize.DataTypes),
