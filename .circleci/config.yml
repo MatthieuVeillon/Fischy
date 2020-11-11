@@ -12,7 +12,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: yarn
-          app-dir: /app
+          app-dir: app
       - run:
           command: cd app && yarn lint
           name: Run linter on app
