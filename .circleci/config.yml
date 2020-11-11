@@ -1,7 +1,22 @@
 version: 2.1
+
 orbs:
-  node: circleci/node@3.0.0
+  node: circleci/node@x.y
+
+jobs:
+  app-lint:
+    executor:
+      name: node/lts
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: cd app && yarn lint
+          name: Run linter on app
+
 workflows:
-  node-tests:
+  build:
     jobs:
-      - node/test
+      - app-lint
+
