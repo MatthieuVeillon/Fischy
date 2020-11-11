@@ -7,7 +7,7 @@ jobs:
   app-lint:
     executor:
       name: node/default
-      tag: '13'
+      tag: 'lts'
     steps:
       - checkout
       - node/install-packages:
