@@ -3,7 +3,6 @@ import http from "http";
 import { sequelize } from "./sequelize";
 http.createServer(app);
 
-console.log("sequelize", sequelize);
 const eraseDatabaseOnSync = true;
 
 sequelize.sync({ force: eraseDatabaseOnSync }).then(() => {

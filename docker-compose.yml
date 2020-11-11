@@ -1,27 +1,33 @@
 version : "3.8"
 services:
+  client:
+    build:
+      context: app
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+      - ./app:/app
+    depends_on:
+      - server
+      - postgres
+
   server:
     build:
       context: ./server
-    ports:
-      - 3000:3000
     depends_on:
       - postgres
-    environment:
-      DATABASE_NAME: boilerplate_db
-      DATABASE_USER: test
-      DATABASE_PASSWORD: test
-      DATABASE_PORT: 5432
+    env_file:
+      - server.env
+
   postgres:
     image: postgres:13
     hostname: postgres
     container_name: postgres
     restart: always
-    environment:
-      PGUSER: lodi
-      PGPASSWORD: 424242
-      POSTGRES_USER: lodi
-      POSTGRES_PASSWORD: 424242
+    env_file:
+      - postgres.env
     volumes:
         - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
 volumes:
