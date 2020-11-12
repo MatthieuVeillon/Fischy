@@ -49,4 +49,9 @@ workflows:
   build:
     jobs:
       - app-lint
-
+      - app-build:
+          requires:
+            - app-lint
+      - build-archives:
+          requires:
+            - app-build
