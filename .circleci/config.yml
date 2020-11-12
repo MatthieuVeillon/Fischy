@@ -16,6 +16,10 @@ jobs:
       - run:
           command: cd app && yarn lint
           name: Run linter on app
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - app/node_modules
   app-build:
     executor:
       name: node/default
