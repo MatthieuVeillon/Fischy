@@ -16,7 +16,35 @@ jobs:
       - run:
           command: cd app && yarn lint
           name: Run linter on app
-
+  app-build:
+    executor:
+      name: node/default
+      tag: 'lts'
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Build
+          command: cd app && yarn build
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - app/dist
+  build-archives:
+    executor:
+      name: node/default
+      tag: 'lts'
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Create archive
+          command: tar -czf archive.tar.gz app/dist
+      - store_artifacts:
+          path: archive.tar.gz
+          destination: /home/circleci/project/archive.tar.gz
 workflows:
   build:
     jobs:
