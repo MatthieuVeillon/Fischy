@@ -1,0 +1,10 @@
+---
+- name: NGINX | Start
+  become: yes
+  service: name=nginx state=started enabled=true
+
+
+- name: NGINX | Suppression de la configuration par defaut
+  become: yes
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  notify: reload nginx

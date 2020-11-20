@@ -1,0 +1,80 @@
+
+
+---
+- name: Deploy React App Front-end Build
+  connection: ssh
+  hosts: staging_host
+  vars:
+    homeDir: /home/ubuntu
+    repo_folder: /var/www/github-deployment/repos/
+    live_folder: /var/www/html
+    repo_name: MatthieuVeillon/Fischy
+    privateKey: /Users/matt/.ssh/id_rsa
+    ansible_distribution_release: "xenial" #trusty
+
+# tasks, indented under playbook name
+  tasks:
+    - name: Create APP Directory
+      file:
+        path: "{{live_folder}}"
+        state: directory
+
+    - name: Install https APT transport
+      apt:
+        name: apt-transport-https
+        update_cache: true
+
+    - name: YARN | Add Yarn APT key
+      apt_key:
+        url: https://dl.yarnpkg.com/debian/pubkey.gpg
+        state: present
+
+    - name: YARN | Add Yarn APT repo
+      apt_repository:
+        repo: deb https://dl.yarnpkg.com/debian/ stable main
+        state: present
+        filename: yarn
+
+    - name: NODE | Add Node APT key
+      apt_key:
+        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+        state: present
+
+    - name: NODE | Add Node APT repo
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_14.x {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: yes
+
+    - name: Install Packages
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - build-essential
+        - nodejs
+        - git
+        - mcrypt
+        - nginx
+        - curl
+        - yarn
+
+    - name: Git clone repo
+      git:
+        repo: git@github.com:{{ repo_name }}.git
+        dest: "{{ repo_folder }}"
+        update: yes
+
+    - name: Install dependencies
+      command: yarn install
+      args:
+        chdir: "{{ repo_folder }}/app"
+
+    - name: Build project
+      command: yarn build
+      args:
+        chdir: "{{ repo_folder }}/app"
+
+    - name: Copy build to live directory
+      command: cp -TRv dist {{ live_folder }}
+      args:
+        chdir: "{{ repo_folder }}/app"
+# end of Playbook
