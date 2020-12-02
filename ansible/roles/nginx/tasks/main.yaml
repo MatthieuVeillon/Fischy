@@ -3,8 +3,38 @@
   become: yes
   service: name=nginx state=started enabled=true
 
-
-- name: NGINX | Suppression de la configuration par defaut
+- name: NGINX | Suppression des sites par defaut
   become: yes
-  file: path=/etc/nginx/sites-enabled/default state=absent
+  file: path=/etc/nginx/sites-available/default state=absent
   notify: reload nginx
+
+- name: NGINX | Suppression des sites existants
+  become: yes
+  file: path=/etc/nginx/sites-available/test-mv.com state=absent
+  notify: reload nginx
+
+- name: NGINX | Create sites par défaut
+  copy:
+    content: '{{ default_sites }}'
+    dest: /etc/nginx/sites-available/test-mv.com
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: NGINX | Disable site configuration
+  become: yes
+  file: path=/etc/nginx/sites-enabled/default  state=absent
+  notify: reload nginx
+
+- name: NGINX | Disable site configuration
+  become: yes
+  file: path=/etc/nginx/sites-enabled/test-mv.com state=absent
+  notify: reload nginx
+
+- name: NGINX | Enable site configuration
+  file:
+    path: /etc/nginx/sites-enabled/test-mv.com
+    state: link
+    src: /etc/nginx/sites-available/test-mv.com
+  notify:
+    - reload nginx

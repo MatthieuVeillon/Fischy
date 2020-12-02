@@ -7,7 +7,7 @@
   vars:
     homeDir: /home/ubuntu
     repo_folder: /var/www/github-deployment/repos/
-    live_folder: /var/www/html
+    live_folder: /var/www/test-mv.com/html
     repo_name: MatthieuVeillon/Fischy
     privateKey: /Users/matt/.ssh/id_rsa
     ansible_distribution_release: "xenial" #trusty
@@ -77,4 +77,9 @@
       command: cp -TRv dist {{ live_folder }}
       args:
         chdir: "{{ repo_folder }}/app"
+
+    - name: setup Nginx
+      include_role:
+        name: nginx
+
 # end of Playbook
