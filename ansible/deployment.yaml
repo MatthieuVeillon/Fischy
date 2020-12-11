@@ -11,6 +11,10 @@
     repo_name: MatthieuVeillon/Fischy
     privateKey: /Users/matt/.ssh/id_rsa
     ansible_distribution_release: "xenial" #trusty
+    database_user: fischy
+    database_name: fischy
+    database_password: fischy
+    service_name: fischy-api
 
 # tasks, indented under playbook name
   tasks:
@@ -52,10 +56,84 @@
         - build-essential
         - nodejs
         - git
+        - postgresql
         - mcrypt
         - nginx
         - curl
         - yarn
+
+    - name: PM2 | Install
+      yarn:
+        name: pm2
+        global: yes
+
+# Create User / Group to be used by POSTGRES
+    - name: Create fischy group
+      group:
+        name: "{{database_user}}"
+        state: present
+
+    - name: Create fischy user
+      user:
+        name: "{{database_user}}"
+        state: present
+        group: "{{database_user}}"
+
+    - name: POSTGRES Create users
+      become: true
+      become_user: postgres
+      postgresql_user:
+        name: "{{database_user}}"
+        state: present
+        password: "{{database_password}}"
+
+    - name: POSTGRES - Create postgresql database
+      postgresql_db:
+        name: "{{database_name}}"
+        state: present
+        owner: "{{database_user}}"
+      become: true
+      become_user: postgres
+
+#    - name: POSTGRES- Install postgresql extensions
+#      postgresql_ext:
+#        name: '{{ ext }}'
+#        db: '{{ db.key }}'
+#      with_items: '{{ db.value.exts|default([]) }}'
+#      loop_control:
+#        loop_var: ext
+#      become: true
+#      become_user: postgres
+
+    - name: Stop the service
+      command: pm2 stop {{service_name}}
+      become: true
+      ignore_errors: yes
+
+    - name: Delete the service
+      command: pm2 delete {{service_name}}
+      become: true
+      ignore_errors: yes
+
+## todo work on this service command making sure I pass all the env variable needed through the command
+    - name: Start service
+      command: env NODE_ENV={{NODE_ENV}} pm2 start npm --name {{service_name}} --instances 1 --max-restarts 5 -- run start:prod
+      become: true
+      args:
+        chdir: "{{live_folder}}"
+# Postgres
+### Create user / group (Q: is this only used for postgres ?)
+### Q : Do I need to install extension
+
+# Backend Service
+### Deploy backend build in api folder  see https://github.com/thetribeio/lodi-backoffice/blob/develop/ansible/deployment.yaml
+### pay attention to before finalize and after_finalize to start the service
+### Q : do I need the service config in my simple use case  ? https://github.com/thetribeio/ansible-roles/blob/255f31405e0b45f9f54311235f7493e66a1635e8/service/templates/service.service.j2
+### stop existing service if any
+### delete existing service if any
+### Configure new service
+### Restart service and passing needed env : see https://sairamkrish.medium.com/simple-ansible-script-to-deploy-nodejs-microservices-37240ad59f1a
+
 
     - name: Git clone repo
       git:

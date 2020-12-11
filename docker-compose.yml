@@ -4,23 +4,29 @@ services:
     build:
       context: app
       dockerfile: Dockerfile.dev
+    environment:
+      API_URL: http://localhost:8000/api
     ports:
       - 3000:3000
     volumes:
       - /app/node_modules
       - ./app:/app
     depends_on:
-      - server
+      - api
       - postgres
 
-  server:
+  api:
     build:
-      context: server
+      context: ./api
     depends_on:
       - postgres
     env_file:
       - server.env
-
+    ports:
+      - 8000:8000
+    volumes:
+      - /app/node_modules
+      - ./api:/app
   postgres:
     image: postgres:13
     hostname: postgres

@@ -4,12 +4,12 @@ const getUsers = async () => {
     return {
       1: {
         id: "1",
-        username: "Robin Wieruch"
+        username: "Robin Wieruch",
       },
       2: {
         id: "2",
-        username: "Dave Davids"
-      }
+        username: "Dave Davids",
+      },
     };
   } catch (e) {
     // Log Errors
@@ -18,5 +18,5 @@ const getUsers = async () => {
 };
 
 module.exports = {
-  getUsers
+  getUsers,
 };
