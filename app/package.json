@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server --host 0.0.0.0 --config build-utils/webpack.config.js --env.env=dev",
+    "start": "webpack-dev-server --host 0.0.0.0 --config build-utils/webpack.config.js --env.env=prod",
     "build": "webpack --config build-utils/webpack.config.js --env.env=prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint '*/**/*.{js,ts,tsx}'"

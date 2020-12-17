@@ -7,20 +7,28 @@
   vars:
     homeDir: /home/ubuntu
     repo_folder: /var/www/github-deployment/repos/
-    live_folder: /var/www/test-mv.com/html
+    live_folder_html: /var/www/test-mv.com/html
+    live_folder_api: /var/www/test-mv.com/api
     repo_name: MatthieuVeillon/Fischy
     privateKey: /Users/matt/.ssh/id_rsa
     ansible_distribution_release: "xenial" #trusty
     database_user: fischy
     database_name: fischy
+    database_host: localhost
     database_password: fischy
+    database_port: 5432
     service_name: fischy-api
 
 # tasks, indented under playbook name
   tasks:
     - name: Create APP Directory
       file:
-        path: "{{live_folder}}"
+        path: "{{live_folder_html}}"
+        state: directory
+
+    - name: Create API Directory
+      file:
+        path: "{{live_folder_api}}"
         state: directory
 
     - name: Install https APT transport
@@ -56,7 +64,6 @@
         - build-essential
         - nodejs
         - git
-        - postgresql
         - mcrypt
         - nginx
         - curl
@@ -66,6 +73,13 @@
       yarn:
         name: pm2
         global: yes
+
+    - name: Install packages
+      apt:
+        name:
+          - postgresql
+          - '{{ (ansible_python_version is version("3.0.0", ">=")) | ternary("python3-psycopg2", "python-psycopg2") }}'
+        update_cache: true
 
 # Create User / Group to be used by POSTGRES
     - name: Create fischy group
@@ -105,22 +119,7 @@
 #      become: true
 #      become_user: postgres
 
-    - name: Stop the service
-      command: pm2 stop {{service_name}}
-      become: true
-      ignore_errors: yes
 
-    - name: Delete the service
-      command: pm2 delete {{service_name}}
-      become: true
-      ignore_errors: yes
-
-## todo work on this service command making sure I pass all the env variable needed through the command
-    - name: Start service
-      command: env NODE_ENV={{NODE_ENV}} pm2 start npm --name {{service_name}} --instances 1 --max-restarts 5 -- run start:prod
-      become: true
-      args:
-        chdir: "{{live_folder}}"
 # Postgres
 ### Create user / group (Q: is this only used for postgres ?)
 ### Q : Do I need to install extension
@@ -141,20 +140,77 @@
         dest: "{{ repo_folder }}"
         update: yes
 
-    - name: Install dependencies
+    - name: APP | Install dependencies
       command: yarn install
       args:
         chdir: "{{ repo_folder }}/app"
 
-    - name: Build project
+    - name: APP | Build project
       command: yarn build
       args:
         chdir: "{{ repo_folder }}/app"
+      environment:
+        NODE_ENV: production
+        REACT_APP_API_URL: http://www.test-mv.com/api/
 
-    - name: Copy build to live directory
-      command: cp -TRv dist {{ live_folder }}
+    - name: APP | Copy build to live directory
+      command: cp -TRv dist {{ live_folder_html }}
       args:
         chdir: "{{ repo_folder }}/app"
+
+    - name: API | Install dependencies
+      command: yarn install
+      args:
+        chdir: "{{ repo_folder }}/api"
+
+    - name: API | Build project
+      command: yarn build
+      args:
+        chdir: "{{ repo_folder }}/api"
+
+    - name: API | Copy build to live directory
+      command: cp -TRv build {{ live_folder_api }}
+      args:
+        chdir: "{{ repo_folder }}/api"
+
+    - name: API | Copy node_modules to live directory
+      command: cp -R node_modules {{ live_folder_api }}
+      args:
+        chdir: "{{ repo_folder }}/api"
+
+
+    - name: API | Stop the service
+      command: pm2 stop {{service_name}}
+      become: true
+      ignore_errors: yes
+
+    - name: API | Delete the service
+      command: pm2 delete {{service_name}}
+      become: true
+      ignore_errors: yes
+
+    - name: API | migrate postgres models
+      command: node_modules/.bin/sequelize db:migrate
+      args:
+        chdir: "{{ live_folder_api }}"
+
+    - name: API | seed postgres
+      command: node_modules/.bin/sequelize sequelize db:seed:all
+      args:
+        chdir: "{{ live_folder_api }}"
+
+    - name: API | Start service
+      command: pm2 start -u {{database_user}} --hp /home/{{database_user}} --name {{service_name}} server.js
+      become: true
+      args:
+        chdir: "{{live_folder_api}}"
+      environment:
+        NODE_ENV: production
+        DATABASE_HOST: "{{database_host}}"
+        DATABASE_NAME: "{{database_name}}"
+        DATABASE_USER: "{{database_user}}"
+        DATABASE_PASSWORD: "{{database_password}}"
+        DATABASE_PORT: "{{database_port}}"
 
     - name: setup Nginx
       include_role:

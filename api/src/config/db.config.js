@@ -13,7 +13,10 @@ module.exports = {
     },
   },
   production: {
-    url: process.env.DATABASE_URL,
+    username: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    host: process.env.DATABASE_HOST,
+    port: process.env.DATABASE_PORT,
     dialect: "postgres",
   },
 };

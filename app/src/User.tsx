@@ -4,16 +4,15 @@ const Users: FC = () => {
     const [users, setUsers] = useState([]);
     useEffect(() => {
         const fetchUser = async () => {
-            const response = await fetch(`http://localhost:8000/api/users`);
+            console.log(`${process.env.REACT_APP_API_URL}users`);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}users`);
             // eslint-disable-next-line no-return-await
-            console.log('response', response);
             const usersData = await response.json();
             setUsers(usersData);
         };
 
         fetchUser();
     }, []);
-    console.log('users', users);
     return (
         <div>
             {users.map(({ name, email }) => (
