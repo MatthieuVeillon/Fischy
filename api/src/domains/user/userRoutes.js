@@ -5,6 +5,8 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   try {
+    console.log("User", models.User);
+
     const users = await models.User.findAll();
     res.status(200).json(users);
   } catch (error) {

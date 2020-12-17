@@ -189,16 +189,6 @@
       become: true
       ignore_errors: yes
 
-    - name: API | migrate postgres models
-      command: node_modules/.bin/sequelize db:migrate
-      args:
-        chdir: "{{ live_folder_api }}"
-
-    - name: API | seed postgres
-      command: node_modules/.bin/sequelize sequelize db:seed:all
-      args:
-        chdir: "{{ live_folder_api }}"
-
     - name: API | Start service
       command: pm2 start -u {{database_user}} --hp /home/{{database_user}} --name {{service_name}} server.js
       become: true
