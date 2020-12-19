@@ -6,7 +6,7 @@
   hosts: staging_host
   vars:
     homeDir: /home/ubuntu
-    repo_folder: /var/www/github-deployment/repos/
+    repo_folder: /var/www/github-deployment/repos
     live_folder_html: /var/www/test-mv.com/html
     live_folder_api: /var/www/test-mv.com/api
     repo_name: MatthieuVeillon/Fischy
@@ -109,31 +109,6 @@
       become: true
       become_user: postgres
 
-#    - name: POSTGRES- Install postgresql extensions
-#      postgresql_ext:
-#        name: '{{ ext }}'
-#        db: '{{ db.key }}'
-#      with_items: '{{ db.value.exts|default([]) }}'
-#      loop_control:
-#        loop_var: ext
-#      become: true
-#      become_user: postgres
-
-
-# Postgres
-### Create user / group (Q: is this only used for postgres ?)
-### Q : Do I need to install extension
-
-# Backend Service
-### Deploy backend build in api folder  see https://github.com/thetribeio/lodi-backoffice/blob/develop/ansible/deployment.yaml
-### pay attention to before finalize and after_finalize to start the service
-### Q : do I need the service config in my simple use case  ? https://github.com/thetribeio/ansible-roles/blob/255f31405e0b45f9f54311235f7493e66a1635e8/service/templates/service.service.j2
-### stop existing service if any
-### delete existing service if any
-### Configure new service
-### Restart service and passing needed env : see https://sairamkrish.medium.com/simple-ansible-script-to-deploy-nodejs-microservices-37240ad59f1a
-
-
     - name: Git clone repo
       git:
         repo: git@github.com:{{ repo_name }}.git
@@ -178,6 +153,11 @@
       args:
         chdir: "{{ repo_folder }}/api"
 
+    - name: API | Copy .sequelizerc to live directory
+      command: cp .sequelizerc {{ live_folder_api }}
+      args:
+        chdir: "{{ repo_folder }}/api"
+
     - name: API | Stop the service
       command: pm2 stop {{service_name}}
       become: true
@@ -187,16 +167,6 @@
       command: pm2 delete {{service_name}}
       become: true
       ignore_errors: yes
-
-    - name: API | migrate postgres models
-      command: node_modules/.bin/sequelize db:migrate
-      args:
-        chdir: "{{ repo_folder }}/api"
-
-    - name: API | seed postgres
-      command: node_modules/.bin/sequelize db:seed:all
-      args:
-        chdir: "{{ repo_folder }}/api"
 
     - name: API | Start service
       command: pm2 start -u {{database_user}} --hp /home/{{database_user}} --name {{service_name}} server.js
