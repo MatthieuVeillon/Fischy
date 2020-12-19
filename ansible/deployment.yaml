@@ -187,10 +187,10 @@
         DATABASE_PASSWORD: "{{database_password}}"
         DATABASE_PORT: "{{database_port}}"
 
-    - name: API | migrate postgres models
-      command: node_modules/.bin/sequelize db:migrate
-      args:
-        chdir: "{{ live_folder_api }}"
+ #   - name: API | migrate postgres models
+  #    command: node_modules/.bin/sequelize db:migrate
+   #   args:
+    #    chdir: "{{ live_folder_api }}"
 
     - name: API | seed postgres
       command: node_modules/.bin/sequelize db:seed:all

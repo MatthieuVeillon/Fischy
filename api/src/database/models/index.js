@@ -6,7 +6,7 @@ const config = require("../../config/db.config");
 const basename = path.basename(__filename);
 const db = {};
 
-console.log("config", config);
+console.info("config in model", config);
 
 const sequelize = new Sequelize(
   config.database,

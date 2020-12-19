@@ -24,6 +24,6 @@ app.use((req, res, next) => {
 app.use("/api/users", userRoutes);
 
 app.listen(process.env.PORT || 8000, () => {
-  console.info("config", config);
+  console.info("config on start", config);
   console.info("Server started!");
 });
