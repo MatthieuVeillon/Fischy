@@ -175,7 +175,7 @@
       ignore_errors: yes
 
     - name: API | Start service
-      command: pm2 start -u {{database_user}} --hp /home/{{database_user}} --name {{service_name}} server.js
+      command: pm2 start -u {{database_user}} --hp /home/{{database_user}} --name {{service_name}} server.js -- -NODE_ENV $NODE_ENV -DATABASE_HOST $DATABASE_HOST -DATABASE_NAME $DATABASE_NAME -DATABASE_USER $DATABASE_USER -DATABASE_PASSWORD $DATABASE_PASSWORD -DATABASE_PORT $DATABASE_PORT
       become: true
       args:
         chdir: "{{live_folder_api}}"
