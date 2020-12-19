@@ -113,6 +113,7 @@
       git:
         repo: git@github.com:{{ repo_name }}.git
         dest: "{{ repo_folder }}"
+        force: yes
         update: yes
 
     - name: APP | Install dependencies
@@ -158,6 +159,11 @@
       args:
         chdir: "{{ repo_folder }}/api"
 
+    - name: Configure .sequelizerc for production
+      command: sed -i "s/'src'/''/g" .sequelizerc
+      args:
+        chdir: "{{ live_folder_api }}"
+
     - name: API | Stop the service
       command: pm2 stop {{service_name}}
       become: true
@@ -167,16 +173,6 @@
       command: pm2 delete {{service_name}}
       become: true
       ignore_errors: yes
-
-    - name: API | migrate postgres models
-      command: node_modules/.bin/sequelize db:migrate
-      args:
-        chdir: "{{ repo_folder }}/api"
-
-    - name: API | seed postgres
-      command: node_modules/.bin/sequelize db:seed:all
-      args:
-        chdir: "{{ repo_folder }}/api"
 
     - name: API | Start service
       command: pm2 start -u {{database_user}} --hp /home/{{database_user}} --name {{service_name}} server.js
@@ -190,6 +186,16 @@
         DATABASE_USER: "{{database_user}}"
         DATABASE_PASSWORD: "{{database_password}}"
         DATABASE_PORT: "{{database_port}}"
+
+    - name: API | migrate postgres models
+      command: node_modules/.bin/sequelize db:migrate
+      args:
+        chdir: "{{ live_folder_api }}"
+
+    - name: API | seed postgres
+      command: node_modules/.bin/sequelize db:seed:all
+      args:
+        chdir: "{{ live_folder_api }}"
 
     - name: setup Nginx
       include_role:
