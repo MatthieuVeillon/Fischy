@@ -4,9 +4,11 @@ const Users: FC = () => {
     const [users, setUsers] = useState([]);
     useEffect(() => {
         const fetchUser = async () => {
-            console.log(`${process.env.REACT_APP_API_URL}users`);
-            console.log(`process env :${process.env}`);
-            const response = await fetch(`${process.env.REACT_APP_API_URL}users`);
+            const url = process.env.REACT_APP_API_URL
+                ? `${process.env.REACT_APP_API_URL}users`
+                : 'http://www.test-mv.com/api/';
+
+            const response = await fetch(url);
             // eslint-disable-next-line no-return-await
             const usersData = await response.json();
             setUsers(usersData);
