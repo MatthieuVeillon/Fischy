@@ -12,12 +12,13 @@
     repo_name: MatthieuVeillon/Fischy
     privateKey: /Users/matt/.ssh/id_rsa
     ansible_distribution_release: "xenial" #trusty
-    database_user: fischy
-    database_name: fischy
+    database_user: fischy2
+    database_name: fischy2
     database_host: localhost
-    database_password: fischy
+    database_password: fischy2
     database_port: 5432
     service_name: fischy-api
+    port: 8000
 
 # tasks, indented under playbook name
   tasks:
@@ -176,18 +177,6 @@
 
     - name: API | migrate postgres models
       command: node_modules/.bin/sequelize db:migrate
-      args:
-        chdir: "{{ live_folder_api }}"
-      environment:
-        NODE_ENV: production
-        DATABASE_HOST: "{{database_host}}"
-        DATABASE_NAME: "{{database_name}}"
-        DATABASE_USER: "{{database_user}}"
-        DATABASE_PASSWORD: "{{database_password}}"
-        DATABASE_PORT: "{{database_port}}"
-
-    - name: API | seed postgres
-      command: node_modules/.bin/sequelize db:seed:all
       args:
         chdir: "{{ live_folder_api }}"
       environment:
