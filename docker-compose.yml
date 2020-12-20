@@ -5,7 +5,7 @@ services:
       context: app
       dockerfile: Dockerfile.dev
     environment:
-      API_URL: http://localhost:8000/api
+      REACT_APP_API_URL: http://localhost:8000/api
     ports:
       - 3000:3000
     volumes:

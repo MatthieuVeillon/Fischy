@@ -5,6 +5,7 @@ const Users: FC = () => {
     useEffect(() => {
         const fetchUser = async () => {
             console.log(`${process.env.REACT_APP_API_URL}users`);
+            console.log(`process env :${process.env}`);
             const response = await fetch(`${process.env.REACT_APP_API_URL}users`);
             // eslint-disable-next-line no-return-await
             const usersData = await response.json();
